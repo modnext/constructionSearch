@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<l10n>
+  <elements>
+    <!-- Search -->
+    <e k="constructionSearch_search" v="Tìm kiếm" />
+    <e k="constructionSearchPlaceholderText" v="Tìm kiếm tên hoặc thương hiệu..." />
+
+    <!-- Sort Buttons -->
+    <e k="constructionSearch_sort_relevance" v="Sự liên quan" />
+    <e k="constructionSearch_sort_price_asc" v="Giá ↑" />
+    <e k="constructionSearch_sort_price_desc" v="Giá ↓" />
+    <e k="constructionSearch_sort_name_asc" v="Tên A-Z" />
+    <e k="constructionSearch_sort_name_desc" v="Tên Z-A" />
+  </elements>
+</l10n>

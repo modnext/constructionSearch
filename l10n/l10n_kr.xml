@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<l10n>
+  <elements>
+    <!-- Search -->
+    <e k="constructionSearch_search" v="검색" />
+    <e k="constructionSearchPlaceholderText" v="이름 또는 브랜드 검색..." />
+
+    <!-- Sort Buttons -->
+    <e k="constructionSearch_sort_relevance" v="관련성" />
+    <e k="constructionSearch_sort_price_asc" v="가격 ↑" />
+    <e k="constructionSearch_sort_price_desc" v="가격 ↓" />
+    <e k="constructionSearch_sort_name_asc" v="이름 A-Z" />
+    <e k="constructionSearch_sort_name_desc" v="이름 Z-A" />
+  </elements>
+</l10n>

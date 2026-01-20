@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<l10n>
+  <elements>
+    <!-- Search -->
+    <e k="constructionSearch_search" v="Search" />
+    <e k="constructionSearchPlaceholderText" v="Search name or brand..." />
+
+    <!-- Sort Buttons -->
+    <e k="constructionSearch_sort_relevance" v="Relevance" />
+    <e k="constructionSearch_sort_price_asc" v="Price ↑" />
+    <e k="constructionSearch_sort_price_desc" v="Price ↓" />
+    <e k="constructionSearch_sort_name_asc" v="Name A-Z" />
+    <e k="constructionSearch_sort_name_desc" v="Name Z-A" />
+  </elements>
+</l10n>

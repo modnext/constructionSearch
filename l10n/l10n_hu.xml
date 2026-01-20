@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<l10n>
+  <elements>
+    <!-- Search -->
+    <e k="constructionSearch_search" v="Keresés" />
+    <e k="constructionSearchPlaceholderText" v="Név vagy márka keresése..." />
+
+    <!-- Sort Buttons -->
+    <e k="constructionSearch_sort_relevance" v="Relevancia" />
+    <e k="constructionSearch_sort_price_asc" v="Ár ↑" />
+    <e k="constructionSearch_sort_price_desc" v="Ár ↓" />
+    <e k="constructionSearch_sort_name_asc" v="Név A-Z" />
+    <e k="constructionSearch_sort_name_desc" v="Név Z-A" />
+  </elements>
+</l10n>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="105">
+  <author>aaw3k</author>
+  <version>1.0.0.0</version>
+
+  <title>
+    <en>Construction Search</en>
+    <de>Konstruktion Suche</de>
+    <fr>Recherche De Construction</fr>
+    <pl>Wyszukiwarka Budowania</pl>
+    <ru>Поиск Конструкций</ru>
+  </title>
+
+  <description>
+    <en><![CDATA[
+Adds a powerful search functionality to the construction menu. Quickly find any placeable object, building, or decoration by typing its name. Features include fuzzy matching (finds items even with typos), real-time filtering, multi-word search, sorting by relevance/price/name, and search across item names, categories, tabs, and brands.
+
+Hotkeys:
+- Press Backspace key while in Search category to focus search input.
+
+For more information or to report a bug, please visit GitHub (modnext/constructionSearch).
+]]></en>
+    <de><![CDATA[
+Fügt eine leistungsstarke Suchfunktion zum Konstruktionsmenü hinzu. Finden Sie schnell jedes platzierbare Objekt, Gebäude oder Dekoration, indem Sie den Namen eingeben. Zu den Funktionen gehören unscharfe Suche (findet Elemente auch bei Tippfehlern), Echtzeitfilterung, Mehrwortsuche, Sortierung nach Relevanz/Preis/Name und Suche nach Elementnamen, Kategorien, Registerkarten und Marken.
+
+Tastenkombinationen:
+- Drücken Sie die Rücktaste, während Sie sich in der Suchkategorie befinden, um das Sucheingabefeld zu fokussieren.
+
+Für weitere Informationen oder um einen Fehler zu melden, besuchen Sie bitte GitHub (modnext/constructionSearch).
+]]></de>
+    <fr><![CDATA[
+Ajoute une puissante fonctionnalité de recherche au menu de construction. Trouvez rapidement tout objet, bâtiment ou décoration en tapant son nom. Les fonctionnalités incluent la recherche floue (trouve les éléments même avec des fautes de frappe), le filtrage en temps réel, la recherche multi-mots, le tri par pertinence/prix/nom et la recherche par noms, catégories, onglets et marques.
+
+Raccourcis clavier:
+- Appuyez sur la touche Retour arrière dans la catégorie Recherche pour activer le champ de recherche.
+
+Pour plus d'informations ou pour signaler un bug, veuillez visiter GitHub (modnext/constructionSearch).
+]]></fr>
+    <pl><![CDATA[
+Dodaje funkcję wyszukiwania do menu budowania. Szybko znajdź dowolny obiekt, budynek lub dekorację, wpisując jego nazwę. Funkcje obejmują wyszukiwanie rozmyte (znajduje elementy nawet przy literówkach), filtrowanie w czasie rzeczywistym, wyszukiwanie wielowyrazowe, sortowanie wg trafności/ceny/nazwy oraz wyszukiwanie po nazwach, kategoriach, zakładkach i markach.
+
+Skróty klawiszowe:
+- Naciśnij klawisz Backspace w kategorii Szukaj, aby aktywować pole wyszukiwania.
+
+Aby uzyskać więcej informacji lub zgłosić błąd, odwiedź GitHub (modnext/constructionSearch).
+]]></pl>
+    <ru><![CDATA[
+Добавляет мощную функцию поиска в меню строительства. Быстро находите любой размещаемый объект, здание или украшение, вводя его название. Функции включают нечёткий поиск (находит элементы даже с опечатками), фильтрацию в реальном времени, многословный поиск, сортировку по релевантности/цене/названию и поиск по названиям, категориям, вкладкам и брендам.
+
+Горячие клавиши:
+- Нажмите клавишу Backspace в категории Поиск, чтобы активировать поле поиска.
+
+Для получения дополнительной информации или сообщения об ошибке посетите GitHub (modnext/constructionSearch).
+]]></ru>
+  </description>
+
+  <l10n filenamePrefix="l10n/l10n" />
+
+  <iconFilename>icon_constructionSearch.dds</iconFilename>
+  <multiplayer supported="true" />
+
+  <extraSourceFiles>
+    <sourceFile filename="src/main.lua" />
+  </extraSourceFiles>
+</modDesc>

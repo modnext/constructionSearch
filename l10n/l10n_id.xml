@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<l10n>
+  <elements>
+    <!-- Search -->
+    <e k="constructionSearch_search" v="Cari" />
+    <e k="constructionSearchPlaceholderText" v="Cari nama atau merek..." />
+
+    <!-- Sort Buttons -->
+    <e k="constructionSearch_sort_relevance" v="Relevansi" />
+    <e k="constructionSearch_sort_price_asc" v="Harga ↑" />
+    <e k="constructionSearch_sort_price_desc" v="Harga ↓" />
+    <e k="constructionSearch_sort_name_asc" v="Nama A-Z" />
+    <e k="constructionSearch_sort_name_desc" v="Nama Z-A" />
+  </elements>
+</l10n>

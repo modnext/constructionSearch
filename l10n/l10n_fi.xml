@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<l10n>
+  <elements>
+    <!-- Search -->
+    <e k="constructionSearch_search" v="Haku" />
+    <e k="constructionSearchPlaceholderText" v="Hae nimeä tai merkkiä..." />
+
+    <!-- Sort Buttons -->
+    <e k="constructionSearch_sort_relevance" v="Vastaavuus" />
+    <e k="constructionSearch_sort_price_asc" v="Hinta ↑" />
+    <e k="constructionSearch_sort_price_desc" v="Hinta ↓" />
+    <e k="constructionSearch_sort_name_asc" v="Nimi A-Z" />
+    <e k="constructionSearch_sort_name_desc" v="Nimi Z-A" />
+  </elements>
+</l10n>

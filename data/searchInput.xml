@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<GUI>
+  <GuiElement profile="constructionSearchContainer">
+    <!-- Search input field -->
+    <TextInput profile="constructionSearchTextInput" id="searchTextInput" onTextChanged="onSearchTextChanged" enterWhenClickOutside="false" imeTitle="" imeDescription="" imePlaceholder="">
+      <ThreePartBitmap profile="constructionSearchInputBg"/>
+      <Button profile="constructionSearchIconBox" id="searchIconButton" onClick="onSearchIconClick"/>
+      <Text profile="constructionSearchPlaceholder" id="searchPlaceholderText" text="$l10n_constructionSearchPlaceholderText" />
+    </TextInput>
+
+    <!-- Sort chips -->
+    <BoxLayout profile="constructionSearchChipsRow" id="sortChips" position="30px -55px" elementSpacing="6px">
+      <Button profile="constructionSearchChip" id="sort_relevance" text="$l10n_constructionSearch_sort_relevance" onClick="onSortChipClick">
+        <ThreePartBitmap profile="constructionSearchChipBg" name="background"/>
+      </Button>
+      <Button profile="constructionSearchChip" id="sort_price" text="$l10n_constructionSearch_sort_price_asc" onClick="onSortChipClick">
+        <ThreePartBitmap profile="constructionSearchChipBg" name="background"/>
+      </Button>
+      <Button profile="constructionSearchChip" id="sort_name" text="$l10n_constructionSearch_sort_name_asc" onClick="onSortChipClick">
+        <ThreePartBitmap profile="constructionSearchChipBg" name="background"/>
+      </Button>
+    </BoxLayout>
+  </GuiElement>
+
+  <GUIProfiles>
+    <!-- Container -->
+    <Profile name="constructionSearchContainer" extends="emptyPanel" with="anchorStretchingYStretchingX pivotTopLeft">
+      <absoluteSizeOffset value="45px 0px" />
+    </Profile>
+
+    <!-- Search input background -->
+    <Profile name="constructionSearchInputBg" extends="fs25_textInputBg"/>
+
+    <!-- Search input -->
+    <Profile name="constructionSearchTextInput" extends="fs25_textInput" with="anchorBottomLeft">
+      <size value="100% 40px" />
+      <textBold value="true" />
+      <absoluteSizeOffset value="55px 0px" />
+      <maxCharacters value="30" />
+      <maxInputTextWidth value="280px" />
+      <position value="30px 0px" />
+      <textUpperCase value="true" />
+    </Profile>
+    <Profile name="constructionSearchIconBox" extends="baseReference" with="anchorMiddleRight">
+      <size value="40px 40px" />
+      <position value="40px 0px" />
+      <handleFocus value="false"/>
+      <iconSize value="16px 16px" />
+      <iconSliceId value="gui.icon_pen" />
+      <iconColor value="$preset_fs25_colorMainLight" />
+      <imageSliceId value="gui.3dShop_button"/>
+      <imageFocusedSliceId value="gui.3dShop_button_selected"/>
+      <imageHighlightedSliceId value="gui.3dShop_button_selected"/>
+    </Profile>
+    <Profile name="constructionSearchPlaceholder" extends="fs25_textDefault" with="anchorMiddleCenter">
+      <textSize value="14px"/>
+      <textMaxNumLines value="1" />
+      <textAutoWidth value="true" />
+      <textColor value="0.6 0.6 0.6 0.6"/>
+      <textAlignment value="center"/>
+      <textUpperCase value="true"/>
+    </Profile>
+
+    <!-- Chips row -->
+    <Profile name="constructionSearchChipsRow" extends="emptyPanel" with="anchorTopLeft">
+      <size value="100% 24px" />
+      <alignmentY value="middle"/>
+      <autoValidateLayout value="true"/>
+      <clipping value="true"/>
+    </Profile>
+
+    <!-- Chip button -->
+    <Profile name="constructionSearchChip" extends="emptyPanel">
+      <size value="80px 22px"/>
+      <handleFocus value="false"/>
+      <fitExtraWidth value="14px"/>
+      <ignorePressedOverlayState value="true"/>
+      <textSize value="10px"/>
+      <textBold value="true"/>
+      <textUpperCase value="true"/>
+      <textAutoWidth value="true"/>
+      <textAlignment value="center"/>
+      <textColor value="$preset_fs25_colorMainLight"/>
+      <textSelectedColor value="$preset_fs25_colorMainDark"/>
+      <textHighlightedColor value="$preset_fs25_colorMainLight"/>
+    </Profile>
+
+    <!-- Chip background -->
+    <Profile name="constructionSearchChipBg" extends="emptyPanel">
+      <handleFocus value="false"/>
+      <imageSliceId value="gui.button_middle"/>
+      <imageColor value="$preset_fs25_colorMainDark_40"/>
+      <imageHighlightedColor value="$preset_fs25_colorMainDark_40"/>
+      <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+      <startImageSize value="6px 0px"/>
+      <startImageSliceId value="gui.button_left"/>
+      <startImageColor value="$preset_fs25_colorMainDark_40"/>
+      <startImageHighlightedColor value="$preset_fs25_colorMainDark_40"/>
+      <startImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+      <endImageSize value="6px 0px"/>
+      <endImageSliceId value="gui.button_right"/>
+      <endImageColor value="$preset_fs25_colorMainDark_40"/>
+      <endImageHighlightedColor value="$preset_fs25_colorMainDark_40"/>
+      <endImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+    </Profile>
+  </GUIProfiles>
+</GUI>

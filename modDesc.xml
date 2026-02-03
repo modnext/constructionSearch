@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="105">
   <author>aaw3k</author>
-  <version>1.0.0.0</version>
+  <version>1.0.1.0</version>
 
   <title>
     <en>Construction Search</en>
@@ -15,6 +15,10 @@
     <en><![CDATA[
 Adds a powerful search functionality to the construction menu. Quickly find any placeable object, building, or decoration by typing its name. Features include fuzzy matching (finds items even with typos), real-time filtering, multi-word search, sorting by relevance/price/name, and search across item names, categories, tabs, and brands.
 
+Changelog Version 1.0.1.0:
+- Added search by mod/DLC name
+- Added minimum query length (2 characters)
+
 Hotkeys:
 - Press Backspace key while in Search category to focus search input.
 
@@ -22,6 +26,10 @@ For more information or to report a bug, please visit GitHub (modnext/constructi
 ]]></en>
     <de><![CDATA[
 Fügt eine leistungsstarke Suchfunktion zum Konstruktionsmenü hinzu. Finden Sie schnell jedes platzierbare Objekt, Gebäude oder Dekoration, indem Sie den Namen eingeben. Zu den Funktionen gehören unscharfe Suche (findet Elemente auch bei Tippfehlern), Echtzeitfilterung, Mehrwortsuche, Sortierung nach Relevanz/Preis/Name und Suche nach Elementnamen, Kategorien, Registerkarten und Marken.
+
+Änderungsprotokoll Version 1.0.1.0:
+- Suche nach Mod/DLC-Name hinzugefügt
+- Mindestabfragelänge hinzugefügt (2 Zeichen)
 
 Tastenkombinationen:
 - Drücken Sie die Rücktaste, während Sie sich in der Suchkategorie befinden, um das Sucheingabefeld zu fokussieren.
@@ -31,6 +39,10 @@ Für weitere Informationen oder um einen Fehler zu melden, besuchen Sie bitte Gi
     <fr><![CDATA[
 Ajoute une puissante fonctionnalité de recherche au menu de construction. Trouvez rapidement tout objet, bâtiment ou décoration en tapant son nom. Les fonctionnalités incluent la recherche floue (trouve les éléments même avec des fautes de frappe), le filtrage en temps réel, la recherche multi-mots, le tri par pertinence/prix/nom et la recherche par noms, catégories, onglets et marques.
 
+Journal des modifications version 1.0.1.0:
+- Ajout de la recherche par nom de mod/DLC
+- Ajout de la longueur minimale de requête (2 caractères)
+
 Raccourcis clavier:
 - Appuyez sur la touche Retour arrière dans la catégorie Recherche pour activer le champ de recherche.
 
@@ -39,6 +51,10 @@ Pour plus d'informations ou pour signaler un bug, veuillez visiter GitHub (modne
     <pl><![CDATA[
 Dodaje funkcję wyszukiwania do menu budowania. Szybko znajdź dowolny obiekt, budynek lub dekorację, wpisując jego nazwę. Funkcje obejmują wyszukiwanie rozmyte (znajduje elementy nawet przy literówkach), filtrowanie w czasie rzeczywistym, wyszukiwanie wielowyrazowe, sortowanie wg trafności/ceny/nazwy oraz wyszukiwanie po nazwach, kategoriach, zakładkach i markach.
 
+Lista zmian w wersji 1.0.1.0:
+- Dodano wyszukiwanie po nazwie moda/DLC
+- Dodano minimalną długość zapytania (2 znaki)
+
 Skróty klawiszowe:
 - Naciśnij klawisz Backspace w kategorii Szukaj, aby aktywować pole wyszukiwania.
 
@@ -46,6 +62,10 @@ Aby uzyskać więcej informacji lub zgłosić błąd, odwiedź GitHub (modnext/c
 ]]></pl>
     <ru><![CDATA[
 Добавляет мощную функцию поиска в меню строительства. Быстро находите любой размещаемый объект, здание или украшение, вводя его название. Функции включают нечёткий поиск (находит элементы даже с опечатками), фильтрацию в реальном времени, многословный поиск, сортировку по релевантности/цене/названию и поиск по названиям, категориям, вкладкам и брендам.
+
+Журнал изменений версии 1.0.1.0:
+- Добавлен поиск по названию мода/DLC
+- Добавлена минимальная длина запроса (2 символа)
 
 Горячие клавиши:
 - Нажмите клавишу Backspace в категории Поиск, чтобы активировать поле поиска.

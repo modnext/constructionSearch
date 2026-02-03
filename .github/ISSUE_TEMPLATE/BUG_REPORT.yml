@@ -28,6 +28,7 @@ body:
       label: Game Version
       description: What version of the game are you playing?
       options:
+        - 1.16.0.0
         - Legacy (< 1.15.0.0)
       default: 0
     validations:

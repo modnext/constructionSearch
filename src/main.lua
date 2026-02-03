@@ -16,6 +16,7 @@ local pendingSearchTime = nil
 local SEARCH_CATEGORY_NAME = "search"
 local FUZZY_THRESHOLD = 0.6
 local SEARCH_DEBOUNCE_MS = 150
+local SEARCH_MIN_LENGTH = 2
 
 -- sort mode definitions with compare functions
 local SORT_MODES = {
@@ -378,6 +379,11 @@ local function performSearch(self, text)
   self.constructionSearchResults = {}
 
   if text == nil or text == "" then
+    return
+  end
+
+  -- Check minimum length requirement
+  if #text < SEARCH_MIN_LENGTH then
     return
   end
 

@@ -408,7 +408,8 @@ local function performSearch(self, text)
       normalizeText(searchItem.tabTitle or ""),
       normalizeText(searchItem.brandName or ""),
       normalizeText(searchItem.brandTitle or ""),
-      normalizeText(searchItem.itemNameEnglish or "")
+      normalizeText(searchItem.itemNameEnglish or ""),
+      normalizeText(searchItem.modName or "")
     }
 
     local allWordsMatch = true
@@ -737,16 +738,22 @@ local function buildAllItemsList(self)
         local item = tabItems[i]
         local brandName = ""
         local brandTitle = ""
+        local modName = ""
 
         if item.displayItem ~= nil and item.displayItem.storeItem ~= nil then
-          local brandIndex = item.displayItem.storeItem.brandIndex
+          local storeItem = item.displayItem.storeItem
+          local brandIndex = storeItem.brandIndex
+
           if brandIndex ~= nil then
             local brand = g_brandManager:getBrandByIndex(brandIndex)
+            
             if brand ~= nil then
               brandName = brand.name or ""
               brandTitle = brand.title or ""
             end
           end
+
+          modName = storeItem.dlcTitle or ""
         end
 
         local itemNameEnglish = getEnglishNameFromItem(item)
@@ -761,7 +768,8 @@ local function buildAllItemsList(self)
           tabTitle = tabTitle,
           brandName = brandName,
           brandTitle = brandTitle,
-          itemNameEnglish = itemNameEnglish
+          itemNameEnglish = itemNameEnglish,
+          modName = modName
         })
       end
     end

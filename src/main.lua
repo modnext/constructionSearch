@@ -612,6 +612,11 @@ local function exitSearchMode(self)
 
   updateSearchPlaceholder(self, false)
 
+  if self.constructionSearchActionEventId ~= nil then
+    g_inputBinding:removeActionEvent(self.constructionSearchActionEventId)
+    self.constructionSearchActionEventId = nil
+  end
+
   if self.constructionSearchInputContainer ~= nil then
     self.constructionSearchInputContainer:setVisible(false)
   end
@@ -648,6 +653,7 @@ local function enterSearchMode(self, index)
     if currentText ~= "" then
       self.constructionSearchText = currentText
       performSearch(self, currentText)
+      syncResultsToItems(self)
       self.itemList:reloadData()
 
       local hasResults = #self.constructionSearchResults > 0
@@ -730,53 +736,73 @@ end
 local function buildAllItemsList(self)
   self.constructionSearchAllItems = {}
 
+  local seen = {}
+
   for categoryIndex, categoryTabs in pairs(self.items) do
-    local category = self.categories[categoryIndex]
-    local categoryName = category and category.name or ""
-    local categoryTitle = category and category.title or ""
+    if categoryIndex ~= searchCategoryIndex then
+      local category = self.categories[categoryIndex]
+      local categoryName = category and category.name or ""
+      local categoryTitle = category and category.title or ""
 
-    for tabIndex, tabItems in pairs(categoryTabs) do
-      local tab = category and category.tabs and category.tabs[tabIndex]
-      local tabName = tab and tab.name or ""
-      local tabTitle = tab and tab.title or ""
+      for tabIndex, tabItems in pairs(categoryTabs) do
+        local tab = category and category.tabs and category.tabs[tabIndex]
+        local tabName = tab and tab.name or ""
+        local tabTitle = tab and tab.title or ""
 
-      for i = 1, #tabItems do
-        local item = tabItems[i]
-        local brandName = ""
-        local brandTitle = ""
-        local modName = ""
+        for i = 1, #tabItems do
+          local item = tabItems[i]
+          local identifier = nil
 
-        if item.displayItem ~= nil and item.displayItem.storeItem ~= nil then
-          local storeItem = item.displayItem.storeItem
-          local brandIndex = storeItem.brandIndex
-
-          if brandIndex ~= nil then
-            local brand = g_brandManager:getBrandByIndex(brandIndex)
-            
-            if brand ~= nil then
-              brandName = brand.name or ""
-              brandTitle = brand.title or ""
-            end
+          if item.storeItem ~= nil and item.storeItem.xmlFilename ~= nil then
+            identifier = item.storeItem.xmlFilename
+          elseif item.brushParameters ~= nil and #item.brushParameters > 0 then
+            identifier = tostring(item.brushClass) .. ":" .. tostring(item.brushParameters[1])
+          elseif item.name ~= nil then
+            identifier = item.name
           end
 
-          modName = storeItem.dlcTitle or ""
+          if identifier == nil or not seen[identifier] then
+            if identifier ~= nil then
+              seen[identifier] = true
+            end
+
+            local brandName = ""
+            local brandTitle = ""
+            local modName = ""
+
+            if item.displayItem ~= nil and item.displayItem.storeItem ~= nil then
+              local storeItem = item.displayItem.storeItem
+              local brandIndex = storeItem.brandIndex
+
+              if brandIndex ~= nil then
+                local brand = g_brandManager:getBrandByIndex(brandIndex)
+
+                if brand ~= nil then
+                  brandName = brand.name or ""
+                  brandTitle = brand.title or ""
+                end
+              end
+
+              modName = storeItem.dlcTitle or ""
+            end
+
+            local itemNameEnglish = getEnglishNameFromItem(item)
+
+            table.insert(self.constructionSearchAllItems, {
+              item = item,
+              categoryIndex = categoryIndex,
+              tabIndex = tabIndex,
+              categoryName = categoryName,
+              categoryTitle = categoryTitle,
+              tabName = tabName,
+              tabTitle = tabTitle,
+              brandName = brandName,
+              brandTitle = brandTitle,
+              itemNameEnglish = itemNameEnglish,
+              modName = modName
+            })
+          end
         end
-
-        local itemNameEnglish = getEnglishNameFromItem(item)
-
-        table.insert(self.constructionSearchAllItems, {
-          item = item,
-          categoryIndex = categoryIndex,
-          tabIndex = tabIndex,
-          categoryName = categoryName,
-          categoryTitle = categoryTitle,
-          tabName = tabName,
-          tabTitle = tabTitle,
-          brandName = brandName,
-          brandTitle = brandTitle,
-          itemNameEnglish = itemNameEnglish,
-          modName = modName
-        })
       end
     end
   end
@@ -831,103 +857,12 @@ local function setCurrentTab(self, superFunc, index)
     if self.constructionSearchInputElement ~= nil then
       FocusManager:setFocus(self.constructionSearchInputElement)
     end
-
-    return
   end
 
   return superFunc(self, index)
 end
 
 ConstructionScreen.setCurrentTab = Utils.overwrittenFunction(ConstructionScreen.setCurrentTab, setCurrentTab)
-
----Override for getNumberOfItemsInSection to return search results count
--- @param self table the ConstructionScreen instance
--- @param superFunc function the original function
--- @param list table the list element
--- @param section number the section index
--- @return number the number of items
-local function getNumberOfItemsInSection(self, superFunc, list, section)
-  if list == self.categorySelector then
-    return #self.categories
-  end
-
-  if self.constructionSearchIsSearchMode and self.constructionSearchResults ~= nil then
-    return #self.constructionSearchResults
-  end
-
-  return superFunc(self, list, section)
-end
-
-ConstructionScreen.getNumberOfItemsInSection = Utils.overwrittenFunction(ConstructionScreen.getNumberOfItemsInSection, getNumberOfItemsInSection)
-
----Override for populateCellForItemInSection to display search results
--- @param self table the ConstructionScreen instance
--- @param superFunc function the original function
--- @param list table the list element
--- @param section number the section index
--- @param index number the item index
--- @param cell table the cell element
-local function populateCellForItemInSection(self, superFunc, list, section, index, cell)
-  if list == self.categorySelector then
-    populateCategoryCell(self, index, cell)
-    return
-  end
-
-  if self.constructionSearchIsSearchMode and self.constructionSearchResults ~= nil then
-    populateSearchResultCell(index, cell, self.constructionSearchResults)
-    return
-  end
-
-  superFunc(self, list, section, index, cell)
-end
-
-ConstructionScreen.populateCellForItemInSection = Utils.overwrittenFunction(ConstructionScreen.populateCellForItemInSection, populateCellForItemInSection)
-
----Override for onListSelectionChanged to handle search results selection
--- @param self table the ConstructionScreen instance
--- @param superFunc function the original function
--- @param list table the list element
--- @param section number the section index
--- @param index number the item index
-local function onListSelectionChanged(self, superFunc, list, section, index)
-  if g_gui.currentlyReloading then
-    return superFunc(self, list, section, index)
-  end
-
-  if list ~= self.itemList or not self.constructionSearchIsSearchMode or self.constructionSearchResults == nil then
-    return superFunc(self, list, section, index)
-  end
-
-  local searchItem = self.constructionSearchResults[index]
-
-  self.lastSelectionIndex = index
-  self:assignItemAttributeData(searchItem and searchItem.item)
-end
-
-ConstructionScreen.onListSelectionChanged = Utils.overwrittenFunction(ConstructionScreen.onListSelectionChanged, onListSelectionChanged)
-
----Override for onListHighlightChanged to handle search results highlighting
--- @param self table the ConstructionScreen instance
--- @param superFunc function the original function
--- @param list table the list element
--- @param section number the section index
--- @param index number the item index
-local function onListHighlightChanged(self, superFunc, list, section, index)
-  if g_gui.currentlyReloading then
-    return superFunc(self, list, section, index)
-  end
-
-  if list ~= self.itemList or not self.constructionSearchIsSearchMode or self.constructionSearchResults == nil then
-    return superFunc(self, list, section, index)
-  end
-
-  local highlightIndex = index or self.lastSelectionIndex
-  local searchItem = self.constructionSearchResults[highlightIndex]
-
-  self:assignItemAttributeData(searchItem and searchItem.item)
-end
-
-ConstructionScreen.onListHighlightChanged = Utils.overwrittenFunction(ConstructionScreen.onListHighlightChanged, onListHighlightChanged)
 
 ---Override for onClickItem to handle search results click
 -- @param self table the ConstructionScreen instance
@@ -1137,6 +1072,14 @@ local function onRegisterMenuActionEvents(self, hasMenuButtons)
 end
 
 ConstructionScreen.registerMenuActionEvents = Utils.appendedFunction(ConstructionScreen.registerMenuActionEvents, onRegisterMenuActionEvents)
+
+---Clears search action event reference on menu cleanup
+-- @param self table the ConstructionScreen instance
+local function onRemoveMenuActionEvents(self)
+  self.constructionSearchActionEventId = nil
+end
+
+ConstructionScreen.removeMenuActionEvents = Utils.appendedFunction(ConstructionScreen.removeMenuActionEvents, onRemoveMenuActionEvents)
 
 ---Cleans up search resources on screen delete
 -- @param self table the ConstructionScreen instance

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="106">
+<modDesc descVersion="107">
   <author>aaw3k</author>
   <version>1.1.0.0</version>
 
@@ -19,8 +19,9 @@ Changelog Version 1.0.1.0:
 - Added search by mod/DLC name
 - Added minimum query length (2 characters)
 
-Changelog Version 1.0.2.0:
+Changelog Version 1.1.0.0:
 - Improved compatibility with other construction menu mods
+- Improved search stability after construction menu refresh and reopen
 - Fixed duplicate items in search results
 
 Hotkeys:
@@ -35,8 +36,9 @@ Fügt eine leistungsstarke Suchfunktion zum Konstruktionsmenü hinzu. Finden Sie
 - Suche nach Mod/DLC-Name hinzugefügt
 - Mindestabfragelänge hinzugefügt (2 Zeichen)
 
-Änderungsprotokoll Version 1.0.2.0:
+Änderungsprotokoll Version 1.1.0.0:
 - Verbesserte Kompatibilität mit anderen Konstruktionsmenü-Mods
+- Stabilität der Suche nach dem Aktualisieren und erneuten Öffnen des Konstruktionsmenüs verbessert
 - Doppelte Elemente in Suchergebnissen behoben
 
 Tastenkombinationen:
@@ -51,8 +53,9 @@ Journal des modifications version 1.0.1.0:
 - Ajout de la recherche par nom de mod/DLC
 - Ajout de la longueur minimale de requête (2 caractères)
 
-Journal des modifications version 1.0.2.0:
+Journal des modifications version 1.1.0.0:
 - Amélioration de la compatibilité avec d'autres mods du menu de construction
+- Amélioration de la stabilité de la recherche après l'actualisation et la réouverture du menu de construction
 - Correction des éléments en double dans les résultats de recherche
 
 Raccourcis clavier:
@@ -67,9 +70,10 @@ Lista zmian w wersji 1.0.1.0:
 - Dodano wyszukiwanie po nazwie moda/DLC
 - Dodano minimalną długość zapytania (2 znaki)
 
-Lista zmian w wersji 1.0.2.0:
+Lista zmian w wersji 1.1.0.0:
 - Poprawiono kompatybilność z innymi modami menu budowania
-- Naprawiono duplikaty w wynikach wyszukiwania
+- Poprawiono stabilność wyszukiwania po odświeżeniu i ponownym otwarciu menu budowania
+- Naprawiono duplikaty elementów w wynikach wyszukiwania
 
 Skróty klawiszowe:
 - Naciśnij klawisz Backspace w kategorii Szukaj, aby aktywować pole wyszukiwania.
@@ -83,9 +87,10 @@ Aby uzyskać więcej informacji lub zgłosić błąd, odwiedź GitHub (modnext/c
 - Добавлен поиск по названию мода/DLC
 - Добавлена минимальная длина запроса (2 символа)
 
-Журнал изменений версии 1.0.2.0:
+Журнал изменений версии 1.1.0.0:
 - Улучшена совместимость с другими модами меню строительства
-- Исправлены дубликаты в результатах поиска
+- Улучшена стабильность поиска после обновления и повторного открытия меню строительства
+- Исправлены дубликаты элементов в результатах поиска
 
 Горячие клавиши:
 - Нажмите клавишу Backspace в категории Поиск, чтобы активировать поле поиска.

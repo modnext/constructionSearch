@@ -18,7 +18,14 @@ local SORT_MODES = {
   sort_relevance = {
     l10nKey = "constructionSearch_sort_relevance",
     compare = function(a, b)
-      return (a.fuzzyScore or 0) > (b.fuzzyScore or 0)
+      local scoreA = a.fuzzyScore or 0
+      local scoreB = b.fuzzyScore or 0
+
+      if scoreA == scoreB then
+        return (a.searchOrder or 0) < (b.searchOrder or 0)
+      end
+
+      return scoreA > scoreB
     end
   },
   sort_price_asc = {
@@ -28,6 +35,11 @@ local SORT_MODES = {
     compare = function(a, b)
       local priceA = a.item and a.item.price or 0
       local priceB = b.item and b.item.price or 0
+
+      if priceA == priceB then
+        return (a.searchOrder or 0) < (b.searchOrder or 0)
+      end
+
       return priceA < priceB
     end
   },
@@ -38,6 +50,11 @@ local SORT_MODES = {
     compare = function(a, b)
       local priceA = a.item and a.item.price or 0
       local priceB = b.item and b.item.price or 0
+
+      if priceA == priceB then
+        return (a.searchOrder or 0) < (b.searchOrder or 0)
+      end
+
       return priceA > priceB
     end
   },
@@ -48,6 +65,11 @@ local SORT_MODES = {
     compare = function(a, b)
       local nameA = a.item and a.item.name or ""
       local nameB = b.item and b.item.name or ""
+
+      if nameA == nameB then
+        return (a.searchOrder or 0) < (b.searchOrder or 0)
+      end
+
       return nameA < nameB
     end
   },
@@ -58,6 +80,11 @@ local SORT_MODES = {
     compare = function(a, b)
       local nameA = a.item and a.item.name or ""
       local nameB = b.item and b.item.name or ""
+
+      if nameA == nameB then
+        return (a.searchOrder or 0) < (b.searchOrder or 0)
+      end
+
       return nameA > nameB
     end
   }
@@ -259,11 +286,74 @@ local function updateSearchInputState(self, isEmpty)
   updateSearchInputPlaceholder(self, isEmpty)
 end
 
+---Clears pending debounced search request
+-- @param self table the ConstructionScreen instance
+local function clearPendingSearch(self)
+  self.constructionSearchPendingText = nil
+  self.constructionSearchPendingTime = nil
+end
+
+---Focuses the search input if it exists
+-- @param self table the ConstructionScreen instance
+-- @return table|nil input element
+local function focusSearchInput(self)
+  local inputElement = self.constructionSearchInputElement
+
+  if inputElement ~= nil then
+    FocusManager:setFocus(inputElement)
+  end
+
+  return inputElement
+end
+
 local updateSortChips
 
----Syncs search results to screen items array
+---Builds cached normalized fields for search matching
+-- @param item table the construction item
+-- @param category table|nil the current category
+-- @param tab table|nil the current tab
+-- @return table normalized search fields
+local function createSearchFields(item, category, tab)
+  local categoryName = category and category.name or ""
+  local categoryTitle = category and category.title or ""
+  local tabName = tab and tab.name or ""
+  local tabTitle = tab and tab.title or ""
+  local brandName = ""
+  local brandTitle = ""
+  local modName = ""
+
+  if item.displayItem ~= nil and item.displayItem.storeItem ~= nil then
+    local storeItem = item.displayItem.storeItem
+    local brandIndex = storeItem.brandIndex
+
+    if brandIndex ~= nil then
+      local brand = g_brandManager:getBrandByIndex(brandIndex)
+
+      if brand ~= nil then
+        brandName = brand.name or ""
+        brandTitle = brand.title or ""
+      end
+    end
+
+    modName = storeItem.dlcTitle or ""
+  end
+
+  return {
+    normalizeText(type(item.name) == "string" and item.name or tostring(item.name or "")),
+    normalizeText(categoryName),
+    normalizeText(categoryTitle),
+    normalizeText(tabName),
+    normalizeText(tabTitle),
+    normalizeText(brandName),
+    normalizeText(brandTitle),
+    normalizeText(getEnglishNameFromItem(item)),
+    normalizeText(modName)
+  }
+end
+
+---Applies search results to the search category items array
 -- @param self table the ConstructionScreen instance
-local function syncResultsToItems(self)
+local function applySearchResultsToSearchCategory(self)
   local searchCategoryIndex = self.constructionSearchCategoryIndex
 
   if searchCategoryIndex == nil then
@@ -330,11 +420,20 @@ local function showSearchPlaceholderDetails(self)
   end
 end
 
+---Shows empty search state in list/details panel
+-- @param self table the ConstructionScreen instance
+-- @param isInputEmpty boolean whether the input is empty
+local function showEmptySearchState(self, isInputEmpty)
+  updateSearchInputState(self, isInputEmpty)
+  updateSearchPlaceholder(self, true)
+  showSearchPlaceholderDetails(self)
+end
+
 ---Refreshes list/details UI after search results changed
 -- @param self table the ConstructionScreen instance
 -- @param isEmpty boolean whether the search text is empty
 local function refreshSearchResultsView(self, isEmpty)
-  syncResultsToItems(self)
+  applySearchResultsToSearchCategory(self)
   self.itemList:reloadData()
 
   local hasResults = #self.constructionSearchResults > 0
@@ -484,23 +583,7 @@ local function performSearch(self, text)
 
   for i = 1, #self.constructionSearchAllItems do
     local searchItem = self.constructionSearchAllItems[i]
-    local itemName = searchItem.item.name
-
-    if type(itemName) ~= "string" then
-      itemName = tostring(itemName or "")
-    end
-
-    local fields = {
-      normalizeText(itemName),
-      normalizeText(searchItem.categoryName or ""),
-      normalizeText(searchItem.categoryTitle or ""),
-      normalizeText(searchItem.tabName or ""),
-      normalizeText(searchItem.tabTitle or ""),
-      normalizeText(searchItem.brandName or ""),
-      normalizeText(searchItem.brandTitle or ""),
-      normalizeText(searchItem.itemNameEnglish or ""),
-      normalizeText(searchItem.modName or "")
-    }
+    local fields = searchItem.searchFields or {}
 
     local allWordsMatch = true
     local totalScore = 0
@@ -549,10 +632,6 @@ end
 -- @param self table the ConstructionScreen instance
 -- @param text string the new search text
 local function onSearchTextChanged(self, text)
-  if self == nil then
-    return
-  end
-
   text = type(text) == "string" and text or ""
 
   local upperText = utf8ToUpper(text)
@@ -566,8 +645,7 @@ local function onSearchTextChanged(self, text)
   updateSearchInputState(self, isEmpty)
 
   if isEmpty then
-    self.constructionSearchPendingText = nil
-    self.constructionSearchPendingTime = nil
+    clearPendingSearch(self)
     executeSearch(self, text)
   else
     self.constructionSearchPendingText = text
@@ -651,8 +729,7 @@ local function exitSearchMode(self)
     return
   end
 
-  self.constructionSearchPendingText = nil
-  self.constructionSearchPendingTime = nil
+  clearPendingSearch(self)
   self.constructionSearchIsSearchMode = false
   self.constructionSearchResults = {}
   self.constructionSearchText = ""
@@ -702,12 +779,10 @@ local function enterSearchMode(self, index)
     if currentText ~= "" then
       executeSearch(self, currentText)
     else
-      updateSearchInputState(self, true)
-      updateSearchPlaceholder(self, true)
-      showSearchPlaceholderDetails(self)
+      showEmptySearchState(self, true)
     end
 
-    FocusManager:setFocus(self.constructionSearchInputElement)
+    focusSearchInput(self)
   else
     updateSearchPlaceholder(self, true)
     showSearchPlaceholderDetails(self)
@@ -731,13 +806,9 @@ local function buildAllItemsList(self)
   for categoryIndex, categoryTabs in ipairs(self.items) do
     if categoryIndex ~= searchCategoryIndex then
       local category = self.categories[categoryIndex]
-      local categoryName = category and category.name or ""
-      local categoryTitle = category and category.title or ""
 
       for tabIndex, tabItems in ipairs(categoryTabs) do
         local tab = category and category.tabs and category.tabs[tabIndex]
-        local tabName = tab and tab.name or ""
-        local tabTitle = tab and tab.title or ""
 
         for i = 1, #tabItems do
           local item = tabItems[i]
@@ -748,38 +819,12 @@ local function buildAllItemsList(self)
               seen[identifier] = true
             end
 
-            local brandName = ""
-            local brandTitle = ""
-            local modName = ""
-
-            if item.displayItem ~= nil and item.displayItem.storeItem ~= nil then
-              local storeItem = item.displayItem.storeItem
-              local brandIndex = storeItem.brandIndex
-
-              if brandIndex ~= nil then
-                local brand = g_brandManager:getBrandByIndex(brandIndex)
-
-                if brand ~= nil then
-                  brandName = brand.name or ""
-                  brandTitle = brand.title or ""
-                end
-              end
-
-              modName = storeItem.dlcTitle or ""
-            end
-
-            local itemNameEnglish = getEnglishNameFromItem(item)
+            local searchOrder = #self.constructionSearchAllItems + 1
 
             table.insert(self.constructionSearchAllItems, {
               item = item,
-              categoryName = categoryName,
-              categoryTitle = categoryTitle,
-              tabName = tabName,
-              tabTitle = tabTitle,
-              brandName = brandName,
-              brandTitle = brandTitle,
-              itemNameEnglish = itemNameEnglish,
-              modName = modName
+              searchOrder = searchOrder,
+              searchFields = createSearchFields(item, category, tab)
             })
           end
         end
@@ -840,11 +885,7 @@ ConstructionScreen.setCurrentCategory = Utils.overwrittenFunction(ConstructionSc
 local function setCurrentTab(self, superFunc, index)
   if self.constructionSearchIsSearchMode then
     self.currentTab = 1
-
-    if self.constructionSearchInputElement ~= nil then
-      FocusManager:setFocus(self.constructionSearchInputElement)
-    end
-
+    focusSearchInput(self)
     return
   end
 
@@ -891,8 +932,7 @@ ConstructionScreen.onClickItem = Utils.overwrittenFunction(ConstructionScreen.on
 -- @param self table the ConstructionScreen instance
 local function rebuildData(self)
   self.constructionSearchCategoryIndex = nil
-  self.constructionSearchPendingText = nil
-  self.constructionSearchPendingTime = nil
+  clearPendingSearch(self)
   self.constructionSearchResults = {}
   self.constructionSearchText = self.constructionSearchText or ""
   self.constructionSearchIsSearchMode = self.constructionSearchIsSearchMode or false
@@ -907,7 +947,7 @@ local function rebuildData(self)
     if self.constructionSearchIsSearchMode and self.currentCategory == self.constructionSearchCategoryIndex then
       refreshSearchResultsView(self, false)
     else
-      syncResultsToItems(self)
+      applySearchResultsToSearchCategory(self)
     end
   end
 end
@@ -995,7 +1035,7 @@ function ConstructionScreen:onSearchIconClick()
     onSearchTextChanged(self, "")
   end
 
-  FocusManager:setFocus(self.constructionSearchInputElement)
+  focusSearchInput(self)
 end
 
 ---Processes pending debounced search
@@ -1011,8 +1051,7 @@ local function onUpdate(self, dt)
   end
 
   local text = self.constructionSearchPendingText
-  self.constructionSearchPendingText = nil
-  self.constructionSearchPendingTime = nil
+  clearPendingSearch(self)
 
   executeSearch(self, text)
 end
@@ -1050,17 +1089,20 @@ ConstructionScreen.draw = Utils.appendedFunction(ConstructionScreen.draw, onDraw
 ---Called when search action event is triggered
 -- @param self table the ConstructionScreen instance
 function ConstructionScreen:onSearchActionEvent()
-  if self.constructionSearchIsSearchMode and self.constructionSearchInputElement ~= nil then
-    FocusManager:setFocus(self.constructionSearchInputElement)
-    self.constructionSearchInputElement.blockTime = 0
-    self.constructionSearchInputElement:onFocusActivate()
+  if self.constructionSearchIsSearchMode and self.currentCategory == self.constructionSearchCategoryIndex then
+    local inputElement = focusSearchInput(self)
+
+    if inputElement ~= nil then
+      inputElement.blockTime = 0
+      inputElement:onFocusActivate()
+    end
   end
 end
 
 ---Registers search action event
 -- @param self table the ConstructionScreen instance
 local function onRegisterMenuActionEvents(self)
-  if self.constructionSearchIsSearchMode then
+  if self.constructionSearchIsSearchMode and self.currentCategory == self.constructionSearchCategoryIndex then
     local _, eventId = g_inputBinding:registerActionEvent(InputAction.MENU_CANCEL, self, self.onSearchActionEvent, false, true, false, true)
     g_inputBinding:setActionEventTextPriority(eventId, GS_PRIO_VERY_LOW)
     g_inputBinding:setActionEventText(eventId, g_i18n:getText("constructionSearch_search"))
@@ -1083,8 +1125,7 @@ ConstructionScreen.removeMenuActionEvents = Utils.appendedFunction(ConstructionS
 ---Cleans up search resources on screen delete
 -- @param self table the ConstructionScreen instance
 local function onDelete(self)
-  self.constructionSearchPendingText = nil
-  self.constructionSearchPendingTime = nil
+  clearPendingSearch(self)
   self.constructionSearchCategoryIndex = nil
   if self.constructionSearchInputContainer ~= nil then
     self.constructionSearchInputContainer:delete()

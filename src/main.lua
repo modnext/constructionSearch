@@ -325,7 +325,36 @@ local function focusSearchInput(self)
   return inputElement
 end
 
-local updateSortChips
+---Updates sort chip labels and selected state
+-- @param self table the ConstructionScreen instance
+local function updateSortChips(self)
+  local search = getSearchState(self)
+
+  if search.sortChipsContainer == nil then
+    return
+  end
+
+  local currentSortMode = search.sortMode or "sort_relevance"
+  local activeMode = SORT_MODES[currentSortMode]
+
+  for _, chip in pairs(search.sortChipsContainer.elements) do
+    if chip.id then
+      local modeId = CHIP_TO_MODE[chip.id]
+
+      if activeMode ~= nil and activeMode.chipId == chip.id then
+        modeId = currentSortMode
+      end
+
+      local mode = modeId ~= nil and SORT_MODES[modeId] or nil
+
+      chip:setSelected(modeId == currentSortMode)
+
+      if mode ~= nil and mode.l10nKey ~= nil then
+        chip:setText(g_i18n:getText(mode.l10nKey))
+      end
+    end
+  end
+end
 
 ---Builds cached normalized fields for search matching
 -- @param item table the construction item
@@ -655,10 +684,10 @@ local function executeSearch(self, text)
   refreshSearchResultsView(self, text == "")
 end
 
----Called when search text changes (with debounce)
+---Handles search text changes (with debounce)
 -- @param self table the ConstructionScreen instance
 -- @param text string the new search text
-local function onSearchTextChanged(self, text)
+local function handleSearchTextChanged(self, text)
   local search = getSearchState(self)
   text = type(text) == "string" and text or ""
 
@@ -679,6 +708,59 @@ local function onSearchTextChanged(self, text)
     search.pendingText = text
     search.pendingTime = g_time + SEARCH_DEBOUNCE_MS
   end
+end
+
+---Handles sort chip click and applies the selected sort mode
+-- @param self table the ConstructionScreen instance
+-- @param element table the clicked chip element
+local function handleSortChipClick(self, element)
+  local search = getSearchState(self)
+
+  if element == nil or element.id == nil then
+    return
+  end
+
+  local chipId = element.id
+  local currentSortMode = search.sortMode or "sort_relevance"
+  local currentMode = SORT_MODES[currentSortMode]
+  local newModeId
+
+  if currentMode and currentMode.chipId == chipId then
+    newModeId = currentMode.toggleTo
+  else
+    newModeId = CHIP_TO_MODE[chipId]
+  end
+
+  if newModeId == nil then
+    return
+  end
+
+  local newMode = SORT_MODES[newModeId]
+  if newMode == nil then
+    return
+  end
+
+  search.sortMode = newModeId
+  updateSortChips(self)
+
+  if search.results and #search.results > 0 then
+    table.sort(search.results, newMode.compare)
+    refreshSearchResultsView(self, search.text == "")
+  end
+end
+
+---Handles search icon click and clears the current search
+-- @param self table the ConstructionScreen instance
+local function handleSearchIconClick(self)
+  local search = getSearchState(self)
+  local hasText = search.text ~= nil and search.text ~= ""
+
+  if hasText and search.inputElement ~= nil then
+    search.inputElement:setText("")
+    handleSearchTextChanged(self, "")
+  end
+
+  focusSearchInput(self)
 end
 
 ---Creates search text input element from XML
@@ -999,93 +1081,22 @@ end
 ---
 ConstructionScreen.rebuildData = Utils.appendedFunction(ConstructionScreen.rebuildData, rebuildData)
 
----Updates sort chip labels and selected state
--- @param self table the ConstructionScreen instance
-updateSortChips = function(self)
-  local search = getSearchState(self)
-
-  if search.sortChipsContainer == nil then
-    return
-  end
-
-  local currentSortMode = search.sortMode or "sort_relevance"
-  local activeMode = SORT_MODES[currentSortMode]
-
-  for _, chip in pairs(search.sortChipsContainer.elements) do
-    if chip.id then
-      local modeId = CHIP_TO_MODE[chip.id]
-
-      if activeMode ~= nil and activeMode.chipId == chip.id then
-        modeId = currentSortMode
-      end
-
-      local mode = modeId ~= nil and SORT_MODES[modeId] or nil
-
-      chip:setSelected(modeId == currentSortMode)
-
-      if mode ~= nil and mode.l10nKey ~= nil then
-        chip:setText(g_i18n:getText(mode.l10nKey))
-      end
-    end
-  end
-end
-
 ---Called when a sort chip is clicked
 -- @param element table the clicked chip element
 function ConstructionScreen:onSortChipClick(element)
-  local search = getSearchState(self)
-
-  if element == nil or element.id == nil then
-    return
-  end
-
-  local chipId = element.id
-  local currentSortMode = search.sortMode or "sort_relevance"
-  local currentMode = SORT_MODES[currentSortMode]
-  local newModeId
-
-  if currentMode and currentMode.chipId == chipId then
-    newModeId = currentMode.toggleTo
-  else
-    newModeId = CHIP_TO_MODE[chipId]
-  end
-
-  if newModeId == nil then
-    return
-  end
-
-  local newMode = SORT_MODES[newModeId]
-  if newMode == nil then
-    return
-  end
-
-  search.sortMode = newModeId
-  updateSortChips(self)
-
-  if search.results and #search.results > 0 then
-    table.sort(search.results, newMode.compare)
-    refreshSearchResultsView(self, search.text == "")
-  end
+  handleSortChipClick(self, element)
 end
 
 ---Called from XML onTextChanged attribute
 -- @param _ table the input element
 -- @param text string the current text
 function ConstructionScreen:onSearchTextChanged(_, text)
-  onSearchTextChanged(self, text)
+  handleSearchTextChanged(self, text)
 end
 
 ---Called when search icon is clicked (clears search if text exists)
 function ConstructionScreen:onSearchIconClick()
-  local search = getSearchState(self)
-  local hasText = search.text ~= nil and search.text ~= ""
-
-  if hasText and search.inputElement ~= nil then
-    search.inputElement:setText("")
-    onSearchTextChanged(self, "")
-  end
-
-  focusSearchInput(self)
+  handleSearchIconClick(self)
 end
 
 ---Processes pending debounced search

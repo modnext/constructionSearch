@@ -834,6 +834,77 @@ local function createSearchInput(self)
   return inputElement
 end
 
+---Returns whether the search action event should be registered
+-- @param self table the ConstructionScreen instance
+-- @return boolean true when the search action event should exist
+local function shouldRegisterSearchAction(self)
+  local search = getSearchState(self)
+
+  return search.isSearchMode and self.currentCategory == search.categoryIndex
+end
+
+---Returns whether the search action should be active in the current UI state
+-- @param self table the ConstructionScreen instance
+-- @return boolean true when the search action can be used
+local function shouldShowSearchAction(self)
+  return shouldRegisterSearchAction(self) and self.configurations == nil
+end
+
+---Removes the search action event if it is currently registered
+-- @param self table the ConstructionScreen instance
+local function removeSearchActionEvent(self)
+  local search = getSearchState(self)
+  local actionEventId = search.actionEventId
+
+  if actionEventId == nil then
+    return
+  end
+
+  g_inputBinding:removeActionEvent(actionEventId)
+  search.actionEventId = nil
+
+  if self.menuEvents ~= nil then
+    for i = #self.menuEvents, 1, -1 do
+      if self.menuEvents[i] == actionEventId then
+        table.remove(self.menuEvents, i)
+      end
+    end
+  end
+end
+
+---Registers the search action event
+-- @param self table the ConstructionScreen instance
+local function registerSearchActionEvent(self)
+  local search = getSearchState(self)
+
+  if not shouldRegisterSearchAction(self) or search.actionEventId ~= nil then
+    return
+  end
+
+  local _, eventId = g_inputBinding:registerActionEvent(InputAction.MENU_CANCEL, self, self.onSearchActionEvent, false, true, false, true)
+  g_inputBinding:setActionEventTextPriority(eventId, GS_PRIO_VERY_LOW)
+  g_inputBinding:setActionEventText(eventId, g_i18n:getText("constructionSearch_search"))
+
+  search.actionEventId = eventId
+  self.menuEvents = self.menuEvents or {}
+  table.insert(self.menuEvents, eventId)
+end
+
+---Updates the search action event based on the current UI state
+-- @param self table the ConstructionScreen instance
+local function updateSearchActionState(self)
+  local search = getSearchState(self)
+  local actionEventId = search.actionEventId
+
+  if actionEventId == nil then
+    return
+  end
+
+  local isActive = shouldShowSearchAction(self)
+  g_inputBinding:setActionEventActive(actionEventId, isActive)
+  g_inputBinding:setActionEventTextVisibility(actionEventId, isActive)
+end
+
 ---Exits search mode and restores normal category view
 -- @param self table the ConstructionScreen instance
 local function exitSearchMode(self)
@@ -851,10 +922,7 @@ local function exitSearchMode(self)
 
   updateSearchPlaceholder(self, false)
 
-  if search.actionEventId ~= nil then
-    g_inputBinding:removeActionEvent(search.actionEventId)
-    search.actionEventId = nil
-  end
+  removeSearchActionEvent(self)
 
   if search.inputContainer ~= nil then
     search.inputContainer:setVisible(false)
@@ -1156,35 +1224,36 @@ ConstructionScreen.draw = Utils.appendedFunction(ConstructionScreen.draw, onDraw
 ---Called when search action event is triggered
 -- @param self table the ConstructionScreen instance
 function ConstructionScreen:onSearchActionEvent()
-  local search = getSearchState(self)
+  if not shouldShowSearchAction(self) then
+    return
+  end
 
-  if search.isSearchMode and self.currentCategory == search.categoryIndex then
-    local inputElement = focusSearchInput(self)
+  local inputElement = focusSearchInput(self)
 
-    if inputElement ~= nil then
-      inputElement.blockTime = 0
-      inputElement:onFocusActivate()
-    end
+  if inputElement ~= nil then
+    inputElement.blockTime = 0
+    inputElement:onFocusActivate()
   end
 end
 
 ---Registers search action event
 -- @param self table the ConstructionScreen instance
 local function onRegisterMenuActionEvents(self)
-  local search = getSearchState(self)
-
-  if search.isSearchMode and self.currentCategory == search.categoryIndex then
-    local _, eventId = g_inputBinding:registerActionEvent(InputAction.MENU_CANCEL, self, self.onSearchActionEvent, false, true, false, true)
-    g_inputBinding:setActionEventTextPriority(eventId, GS_PRIO_VERY_LOW)
-    g_inputBinding:setActionEventText(eventId, g_i18n:getText("constructionSearch_search"))
-
-    search.actionEventId = eventId
-    table.insert(self.menuEvents, eventId)
-  end
+  registerSearchActionEvent(self)
+  updateSearchActionState(self)
 end
 
 ---
 ConstructionScreen.registerMenuActionEvents = Utils.appendedFunction(ConstructionScreen.registerMenuActionEvents, onRegisterMenuActionEvents)
+
+---Updates the search action after the configurations panel is toggled
+-- @param self table the ConstructionScreen instance
+local function onShowConfigs(self)
+  updateSearchActionState(self)
+end
+
+---
+ConstructionScreen.onShowConfigs = Utils.appendedFunction(ConstructionScreen.onShowConfigs, onShowConfigs)
 
 ---Clears search action event reference on menu cleanup
 -- @param self table the ConstructionScreen instance
